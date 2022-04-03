@@ -5,8 +5,7 @@ author 'thedoc'
 
 
 client_scripts {
-    'client/**',
-    'utils/utils.lua'
+    'client/**'
 }
 
 
