@@ -3,4 +3,7 @@
 
 ## Dependencies
 * **[qb-core](https://github.com/qbcore-framework/qb-core)**
+
+
+## Optional
 * **[qb-target](https://github.com/BerkieBb/qb-target/)**
