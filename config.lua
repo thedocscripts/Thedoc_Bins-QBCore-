@@ -4,6 +4,8 @@ Config.Text = "Bin"
 Config.Binmaxweight = 4000000
 Config.Binslots = 300
 Config.UseQBTarget = false
+Config.AutoDelete = true
+
 Config.Bins = {
     "prop_bin_05a",
     "prop_bin_08a",
