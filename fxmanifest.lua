@@ -1,14 +1,6 @@
 fx_version 'cerulean'
-games { 'gta5' }
+games {'gta5'}
 author 'thedoc'
 
-
-
-client_scripts {
-    'client/**'
-}
-
-
-shared_scripts {
-    'config.lua'
-}
+shared_script 'config.lua'
+client_script 'client/client.lua'
