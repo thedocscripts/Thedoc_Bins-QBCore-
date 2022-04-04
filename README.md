@@ -1,4 +1,4 @@
-# thedoc-bins (stash) | qb-core
+# Thedoc-Bins (stash) | qb-core
 ![This is an image](https://cdn.discordapp.com/attachments/841430505609756682/960461152943484938/th-bins.png)
 
 ## Dependencies
