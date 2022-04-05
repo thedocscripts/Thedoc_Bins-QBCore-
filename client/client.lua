@@ -1,4 +1,5 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+local closetobin = false
 
 CreateThread(function()
     if Config.UseQBTarget then
@@ -6,7 +7,7 @@ CreateThread(function()
             options = {
                 {
                     type = "client",
-                    event = "qb-client:GetClosestBin",
+                    event = "qb-client:targetbin",
                     icon = "fas fa-trash",
                     label = Config.Text,
                 },
@@ -16,17 +17,15 @@ CreateThread(function()
     end
 end)
 
-
-local closetobin = false
-Citizen.CreateThread(function()
+CreateThread(function()
     if not Config.UseQBTarget then
-        local sleep = 1000
         while true do
+            local sleep = 1250
             local closestobj = GetClosestBin()
             local objpos = GetEntityCoords(closestobj)
             if closestobj ~= nil then
                 if not closetobin then
-                    displaybin(objpos, closestobj)
+                    DisplayBin(objpos, closestobj)
                     closetobin = true
                 end
             else
@@ -37,29 +36,19 @@ Citizen.CreateThread(function()
     end
 end)
 
-RegisterNetEvent('qb-client:GetClosestBin', function()
-    local ped = PlayerPedId()
-    local pos = GetEntityCoords(ped)
-    local object = nil
-    for _, machine in pairs(Config.Bins) do
-        local ClosestObject = GetClosestObjectOfType(pos.x, pos.y, pos.z, 1.0, GetHashKey(machine), 0, 0, 0)
-        if ClosestObject ~= 0 then
-            if object == nil then
-                object = ClosestObject
-                DisplayBin(ClosestObject)
-            end
-        end
+RegisterNetEvent('qb-client:targetbin', function()
+    local targetobj = GetClosestBin()
+    if targetobj ~= nil then
+        StashBin(targetobj)
     end
-    return object
 end)
-
 
 function GetClosestBin()
     local ped = PlayerPedId()
     local pos = GetEntityCoords(ped)
     local object = nil
-    for _, machine in pairs(Config.Bins) do
-        local ClosestObject = GetClosestObjectOfType(pos.x, pos.y, pos.z, 1.0, GetHashKey(machine), 0, 0, 0)
+    for _, bins in pairs(Config.Bins) do
+        local ClosestObject = GetClosestObjectOfType(pos.x, pos.y, pos.z, 1.0, GetHashKey(bins), 0, 0, 0)
         if ClosestObject ~= 0 then
             if object == nil then
                 object = ClosestObject
@@ -69,29 +58,22 @@ function GetClosestBin()
     return object
 end
 
-function DisplayBin(obj)
+function DisplayBin(objpos, closestobj)
+    CreateThread(function()
+        while closetobin do
+            QBCore.Functions.DrawText3D(objpos.x, objpos.y, objpos.z + 1, "~b~[E]~w~ - " ..Config.Text)
+            if IsControlJustPressed(0, 38) then
+                StashBin(closestobj)
+            end
+        Wait(5)
+        end
+    end)
+end
+
+function StashBin(obj)
     TriggerServerEvent("inventory:server:OpenInventory", "stash", "bin" .. tostring(obj), {
         maxweight = Config.Binmaxweight,
         slots = Config.Binslots,
     })
     TriggerEvent("inventory:client:SetCurrentStash", "bin" .. tostring(obj))
-end
-
-
-function displaybin(objpp, _closestobj)
-    Citizen.CreateThread(function()
-        local closestobj = _closestobj
-        local objpos = objpp
-        while closetobin do
-                QBCore.Functions.DrawText3D(objpos.x, objpos.y, objpos.z + 1, Config.Text)
-                if IsControlJustPressed(0, 38) then
-                    TriggerServerEvent("inventory:server:OpenInventory", "stash", "bin" .. tostring(closestobj), {
-                        maxweight = Config.Binmaxweight,
-                        slots = Config.Binslots,
-                    })
-                    TriggerEvent("inventory:client:SetCurrentStash", "bin" .. tostring(closestobj))
-                end
-            Wait(0)
-        end
-    end)
 end
